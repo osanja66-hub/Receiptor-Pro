@@ -1,7 +1,7 @@
 services:
   - type: static
     name: receiptor-pro
-    repo: https://github.com/<your-org-or-user>/<repo>
+    repo: https://github.com/osanja66-hub/Receiptor-Pro
     branch: main
     buildCommand: npm run build
     publishPath: build
