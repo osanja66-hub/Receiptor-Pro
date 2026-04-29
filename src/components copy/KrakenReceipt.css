@@ -1,0 +1,43 @@
+.kraken-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 18px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.kraken-container.dark { color: #fff; background: transparent; }
+.kraken-container.light { color: #111; background: #fff; }
+
+.kraken-header { display:flex; gap:12px; align-items:center; margin-bottom: 14px; }
+.kraken-icon { width:44px; height:44px; border-radius: 50%; background:#3b3bff; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; }
+.kraken-title .kraken-subtitle { font-size:14px; color: #666; }
+.kraken-amount { font-size:24px; font-weight:800; margin-top:4px; }
+
+.kraken-card { border-radius:14px; padding:14px; background: rgba(255,255,255,0.03); }
+.kraken-container.light .kraken-card { background: #f6f7f9; }
+
+.kraken-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom: 1px dashed rgba(0,0,0,0.06); font-size:14px; }
+.kraken-row.top { align-items:flex-start; }
+.kraken-label { color:#7b7f88; width: 45%; }
+.kraken-value { text-align:right; width:55%; word-break:break-word; }
+
+.kraken-multiline { display:inline-block; text-align:right; line-height:1.3; max-width: 100%; }
+.kraken-copy-btn { background:none; border:none; cursor:pointer; margin-left:8px; color: #6b6b6b; }
+
+.kraken-explorer-btn {
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.06);
+  border: none;
+  cursor: pointer;
+  font-weight:600;
+}
+
+.kraken-badge {
+  margin-left:8px;
+  background: #e6fbef;
+  color: #0b8a4a;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size:12px;
+}

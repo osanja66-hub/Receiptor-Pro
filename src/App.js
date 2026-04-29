@@ -1,40 +1,32 @@
-import React, { useState } from 'react';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
-import { ReceiptForm } from './components/ReceiptForm';
-import { BinanceReceipt } from './components/BinanceReceipt';
+import { ReceiptForm } from './components/ReceiptForm'; // named export in your file
+import FormRouter from './pages/FormRouter.jsx'; // ensure this file exists
+import ReceiptPage from './pages/ReceiptPage.jsx'; // explicit .jsx path
+import WalletsPage from './pages/WalletsPage.jsx'; // explicit .jsx path
 import './App.css';
 
 function App() {
-  const [status, setStatus] = useState('idle'); // idle | generating | done
-  const [formData, setFormData] = useState({});
-
-  const handleGenerate = (data) => {
-    setFormData(data);
-    setStatus('generating');
-
-    setTimeout(() => {
-      setStatus('done');
-    }, 1500); // simulate loading
-  };
-
   return (
     <ThemeProvider>
-      <div className="App">
+      <Router>
+        <Routes>
+          <Route path="/" element={<WalletsPage />} />
 
-        {/* FORM */}
-        <ReceiptForm 
-          onGenerate={handleGenerate}
-          status={status}
-        />
+          {/* Per-wallet route: /form/:platform -> FormRouter chooses the correct form component */}
+          <Route path="/form/:platform" element={<FormRouter />} />
 
-        {/* RECEIPT (only after complete) */}
-        {status === 'done' && (
-          <BinanceReceipt 
-            data={formData}
-          />
-        )}
+          {/* Generic fallback form (shows fields for a selected wallet or the generic picker) */}
+          <Route path="/form" element={<ReceiptForm />} />
 
-      </div>
+          <Route path="/receipt" element={<ReceiptPage />} />
+
+          {/* Unknown route -> home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }

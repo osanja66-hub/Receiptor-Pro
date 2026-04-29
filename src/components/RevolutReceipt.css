@@ -1,0 +1,122 @@
+/* RevolutReceipt.css - refined to match reference exactly,
+   includes stronger visible green connector line and notch overlap */
+
+/* Container: same black bg used in preview area */
+.revolut-screen {
+  width: 100%;
+  max-width: 620px;
+  box-sizing: border-box;
+  padding: 0px 1px 4px;
+  background: #000;
+  color: #d7d7d7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Inner phone content wrapper - helps fit & notch placement */
+.revolut-phone-inner {
+  /* small scale so full receipt remains visible inside MobileFrame preview */
+  transform-origin: top center;
+  transform: scale(0.98);
+}
+
+/* top row (status area) */
+.rev-top { display:flex; align-items:center; gap:8px; margin-bottom: 8px; }
+.rev-back {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  width:44px; height:44px; border-radius:22px;
+  border:none; font-size:22px; display:inline-flex;
+  align-items:center; justify-content:center; cursor:pointer;
+}
+.rev-spacer { flex:1; }
+.rev-icons { color:#9b9b9b; font-size:12px; }
+
+/* header area - avatar sits into notch */
+.rev-header { display:flex; align-items:center; gap:14px; justify-content:center; flex-direction:column; margin-top: 6px; margin-bottom: 8px; }
+.rev-avatar {
+  width:64px; height:64px; border-radius:999px; background:#607a95;
+  color:#e6eef8; display:flex; align-items:center; justify-content:center;
+  font-weight:800; font-size:28px; box-shadow: 0 8px 22px rgba(0,0,0,0.7);
+  margin-bottom:8px;
+  /* overlap more into the notch like the real app */
+  margin-top: -18px;
+}
+.rev-to { text-align:center; display:flex; gap:8px; align-items:center; flex-direction:column; }
+.rev-to-pre { color:#9e9e9e; font-size:19px; }
+.rev-to-name { color:#5ea0ff; font-size:18px; font-weight:500; }
+
+/* amount styles */
+.rev-amount { text-align:center; margin: 12px 0 12px; }
+.rev-amount-main { font-size:40px; font-weight:600; color:#d6d6d6; letter-spacing:0.2px; line-height:1; }
+.rev-currency { font-size:40px; color:#d6d6d6; font-weight:500; margin-left:8px; vertical-align:middle; }
+.rev-subtitle { color:#9a9a9a; margin-top:14px; font-size:15px; }
+
+/* base card */
+.rev-card { background: #1f1f21; border-radius: 18px; padding: 14px 16px; margin: 16px 0; box-shadow: 0 12px 30px rgba(0,0,0,0.6); overflow: visible; }
+
+/* card title */
+.rev-card-title { color:#bfbfbf; font-size:16px; font-weight:600; margin-bottom:14px; }
+
+/* steps list container - *this* pseudo-element draws the continuous green bar */
+.rev-steps-list { position:relative; display:flex; flex-direction:column; gap:34px; padding-left:6px; }
+
+/* the vertical connector line (thicker, vivid green) */
+.rev-steps-list::before {
+  content: "";
+  position:absolute;
+  left: 27px; /* aligned with dot center */
+  top: 27px;  /* leave room above first dot */
+  bottom: 44px;/* leave room below last dot */
+  width: 5px;
+  background: linear-gradient(#19d169, #19d169);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(25,209,105,0.12);
+  z-index: 0;
+}
+
+/* step row */
+.rev-step-row { display:flex; gap:-2px; align-items:flex-start; position:relative; z-index:1; }
+.rev-step-indicator { width:48px; display:flex; align-items:flex-start; justify-content:center; position:relative; padding-top:2px; }
+.rev-step-indicator .dot { width:12px; height:12px; border-radius:50%; background:#6b6b6b; margin-top:2px; }
+.rev-step-indicator .dot.done { background:#19d169; box-shadow:0 0 0 0px rgba(25,209,105,0.08); }
+
+/* step text */
+.rev-step-body { flex:1; }
+.rev-step-label { color:#f1f1f1; font-weight:700; margin-bottom:6px; font-size:15px; }
+.rev-step-time { color:#a2a2a2; font-size:14px; }
+
+/* details rows */
+.rev-row { display:flex; justify-content:space-between; align-items:center; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+.rev-row:last-child { border-bottom:none; }
+.rev-row-label { color:#9a9a9a; font-size:15px; }
+.rev-row-value { display:flex; align-items:center; gap:10px; color:#cfd6df; font-weight:700; }
+.rev-eye { color:#5ea0ff; }
+.rev-link { background:none; border:none; color:#5ea0ff; font-weight:700; font-size:15px; cursor:pointer; padding:6px; }
+.rev-link:hover { text-decoration:underline; }
+
+/* network */
+.network-val { display:flex; align-items:center; gap:10px; color:#cfd6df; }
+.network-icon-wrap { width:28px; height:28px; border-radius:6px; background:#0f0f10; display:flex; align-items:center; justify-content:center; color:#cfd6df; }
+.network-name { font-weight:700; }
+
+/* amounts card */
+.rev-amount-row { display:flex; justify-content:space-between; align-items:flex-start; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.02); }
+.rev-amount-row.last { border-bottom:none; }
+.rev-amount-label { color:#9a9a9a; font-size:15px; }
+.rev-amount-value { text-align:right; min-width:140px; }
+.rev-amount-value .big { color:#f1f1f1; font-weight:400; font-size:16px; }
+.rev-amount-value .fiat { color:#9b9b9b; font-size:13px; margin-top:6px; }
+.rev-amount-value .blue { color:#5ea0ff; font-weight:900; }
+
+/* info link with icon */
+.link-with-icon { display:flex; align-items:center; gap:8px; color:#5ea0ff; font-weight:700; }
+
+/* download button */
+.rev-download { background:none; border:none; color:#5ea0ff; font-weight:700; display:inline-flex; align-items:center; gap:8px; cursor:pointer; padding:6px; }
+
+/* responsive */
+@media (max-width:420px) {
+  .rev-amount-main { font-size:44px; }
+  .rev-avatar { width:76px; height:76px; font-size:24px; margin-top:-14px; }
+  .rev-card { padding:12px; border-radius:16px; }
+}

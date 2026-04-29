@@ -1,0 +1,274 @@
+/* TRUE 1:1 Kraken receipt clone */
+
+.kraken-screen {
+  width: 100%;
+  max-width: 374px;
+  margin: 0 auto;
+  background: #f6f6f8;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+/* HEADER */
+.kr-header {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  margin-bottom: 10px;
+}
+
+.kr-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.kr-icon-img {
+  width: 100%;
+}
+
+.kr-sub {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+}
+
+.kr-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+}
+
+/* ROWS */
+.kr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.kr-row.dashed {
+  border-bottom: 1px dashed #e5e5e5;
+}
+
+/* LABEL */
+.kr-label {
+  color: #8b9096;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* VALUE */
+.kr-value {
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* TOTAL */
+.kr-value.total {
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.total-main {
+  font-weight: 700;
+}
+
+.kr-fiat {
+  font-size: 12px;
+  color: #8b9096;
+}
+
+/* STATUS */
+.kr-badge {
+  background: #e6f4ea;
+  color: #1a9c4a;
+  font-size: 10px;
+  padding: 3px 3px;
+  border-radius: 999px;
+}
+
+/* NETWORK */
+.network {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.network-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.network-icon-img {
+  width: 100%;
+}
+
+.network-name {
+  font-weight: 600;
+}
+
+/* TEXT STYLES */
+.muted-underline {
+  border-bottom: 1px dashed #ddd;
+  color: #6f747a;
+  padding-bottom: 1px;
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.date-value {
+  font-weight: 600;
+}
+
+/* ICON BUTTONS (COPY + ARROW) */
+.copy-btn {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  cursor: pointer;
+}
+
+/* copy icon */
+.copy-btn.copy::before,
+.copy-btn.copy::after {
+  content: "";
+  position: absolute;
+  border: 1.5px solid #9aa9a7;
+  border-radius: 2px;
+  width: 7px;
+  height: 7px;
+}
+
+.copy-btn.copy::before {
+  top: 3px;
+  left: 9px;
+}
+
+.copy-btn.copy::after {
+  top: 40;
+  left: 7px;
+  background: #f6f6f8;
+}
+
+/* arrow icon */
+.copy-btn.arrow::before {
+  content: "↗";
+  font-size: 13px;
+  color: #9aa0a8;
+}
+
+/* BUTTON */
+.kr-explorer-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 112px;
+  border-radius: 999px;
+  background: #e7e8ea;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* FOOTER */
+.kr-note {
+  margin-top: 32px;
+  font-size: 11px;
+  color: #9aa0a8;
+  text-align: center;
+
+}
+
+.kr-header {
+  display: flex;
+  flex-direction: column;
+  gap: 50px; /* 🔥 reduced from 50px → tighter like original */
+  margin-bottom: 10px;
+}
+
+/* Move top icon higher (match original spacing) */
+.kr-header {
+  gap: 22px; /* was 50px */
+  position: relative;
+}
+
+/* Back button (top-left) */
+.kr-header::before {
+  content: "‹";
+  position: absolute;
+  top: -18px;
+  left: -10px;
+  font-size: 38px;
+  color: #111;
+  cursor: pointer;
+}
+
+.kr-icon {
+  margin-top: 38px;
+}
+
+
+/* ===== DARK MODE ===== */
+.kraken-screen.dark {
+  background: #0f1419;
+  color: #eaecef;
+}
+
+/* labels */
+.kraken-screen.dark .kr-label,
+.kraken-screen.dark .kr-fiat,
+.kraken-screen.dark .kr-note,
+.kraken-screen.dark .muted-underline {
+  color: #848e9c;
+}
+
+/* rows divider */
+.kraken-screen.dark .kr-row.dashed {
+  border-bottom: 1px dashed rgba(255,255,255,0.08);
+}
+
+/* badge stays green but cleaner */
+.kraken-screen.dark .kr-badge {
+  background: rgba(2,192,118,0.15);
+  color: #02c076;
+}
+
+/* button */
+.kraken-screen.dark .kr-explorer-btn {
+  background: #2b3139;
+  color: #eaecef;
+}
+
+/* icons */
+.kraken-screen.dark .copy-btn.copy::before,
+.kraken-screen.dark .copy-btn.copy::after {
+  border-color: #848e9c;
+}
+
+.kraken-screen.dark .copy-btn.arrow::before {
+  color: #848e9c;
+}
+
+/* ===== KEEP ICON COLORS SAME (no change in dark mode) ===== */
+.kraken-screen.dark .kr-icon-img,
+.kraken-screen.dark .network-icon-img {
+  filter: none !important;
+}
+
+/* ===== TEXT THAT MUST TURN WHITE IN DARK MODE ===== */
+.kraken-screen.dark .kr-sub,
+.kraken-screen.dark .kr-amount {
+  color: #ffffff;
+}
+
+/* ===== BACK BUTTON COLOR IN DARK MODE ===== */
+.kraken-screen.dark .kr-header::before {
+  color: #ffffff;
+}
+
