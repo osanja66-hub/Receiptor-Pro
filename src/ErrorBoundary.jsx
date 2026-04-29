@@ -11,30 +11,53 @@ export default class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    // keep the info so it can be shown in the UI, and log to console
+    // Log to console and persist the info object
     console.error('ErrorBoundary caught:', error, info);
     this.setState({ info });
-    // Optional: forward to your logging service here (Sentry, LogRocket, etc.)
   }
 
   render() {
     const { error, info } = this.state;
     if (error) {
+      // Show the full error object, message and stack so we can diagnose in production
       return (
         <div style={{
           padding: 20,
           background: '#fff',
           color: '#111',
-          fontFamily: 'monospace'
+          fontFamily: 'monospace',
+          whiteSpace: 'pre-wrap'
         }}>
-          <h2>Application error</h2>
-          <div><strong>Error:</strong>
-            <pre style={{ whiteSpace: 'pre-wrap' }}>{String(error && error.toString())}</pre>
+          <h2>Application error (detailed)</h2>
+
+          <div style={{ marginTop: 8 }}>
+            <strong>error.toString():</strong>
+            <pre>{String(error && error.toString())}</pre>
           </div>
-          <div><strong>Component stack:</strong>
-            <pre style={{ whiteSpace: 'pre-wrap' }}>{info && info.componentStack}</pre>
+
+          <div style={{ marginTop: 8 }}>
+            <strong>error.message:</strong>
+            <pre>{error && error.message}</pre>
           </div>
-          <div>Open DevTools Console for more details.</div>
+
+          <div style={{ marginTop: 8 }}>
+            <strong>error.stack:</strong>
+            <pre>{error && error.stack}</pre>
+          </div>
+
+          <div style={{ marginTop: 8 }}>
+            <strong>component stack (React):</strong>
+            <pre>{info && info.componentStack}</pre>
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <strong>Full error object (JSON):</strong>
+            <pre>{JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}</pre>
+          </div>
+
+          <div style={{ marginTop: 12, color: '#666' }}>
+            Copy the text above and paste it here so I can map it back to your source.
+          </div>
         </div>
       );
     }
