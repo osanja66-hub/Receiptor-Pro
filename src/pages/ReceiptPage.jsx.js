@@ -9,6 +9,9 @@ import CoinbaseReceipt from '../components/CoinbaseReceipt';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
+// NOTE: If you have a RevolutReceipt component, import it here:
+// import RevolutReceipt from '../components/RevolutReceipt';
+
 export default function ReceiptPage() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,14 +20,12 @@ export default function ReceiptPage() {
   const receiptRef = useRef(null);
 
   useEffect(() => {
-    // Prefer navigation state
     if (location.state && location.state.receiptData) {
       setData(location.state.receiptData);
       try { localStorage.setItem('latestReceiptData', JSON.stringify(location.state.receiptData)); } catch {}
       return;
     }
 
-    // Fallback to localStorage
     try {
       const stored = localStorage.getItem('latestReceiptData');
       if (stored) {
@@ -40,9 +41,11 @@ export default function ReceiptPage() {
 
   if (!data) return null;
 
-  const platform = (data.platform || '').toString().toLowerCase().trim();
+  // Read platform from data.platform first, fallback to URL path (e.g. /form/revolut)
+  const pathPlatform = (location.pathname || '').split('/').filter(Boolean).pop() || '';
+  const platform = (data.platform || pathPlatform || '').toString().toLowerCase().trim();
 
-  // Kraken normalization
+  // Normalizations (unchanged)
   const krakenData = {
     withdrawalAmount: data.withdrawalAmount,
     currency: data.currency,
@@ -59,7 +62,6 @@ export default function ReceiptPage() {
     receiptId: data.receiptId || '',
   };
 
-  // Coinbase normalization
   const coinbaseData = {
     amount: data.amount || data.withdrawalAmount || '',
     currency: data.currency || 'ETH',
@@ -76,10 +78,6 @@ export default function ReceiptPage() {
     receiptId: data.receiptId || ''
   };
 
-  // For Binance, pass the exact keys BinanceReceipt expects:
-  // - remarks (txid/remarks)
-  // - withdrawalAccount (wallet)
-  // - timestamp (date)
   const binanceData = {
     withdrawalAmount: data.withdrawalAmount,
     currency: data.currency,
@@ -93,12 +91,14 @@ export default function ReceiptPage() {
     receiptId: data.receiptId || ''
   };
 
-  // Build a simple text fallback for copying
+  // If you have a Revolut data normalization, add a revolutData object here.
+
+  // Capture / copy / download helpers (unchanged from previous implementation)
   const makeReceiptText = () => {
     const r = data || {};
     return [
       'Receipt',
-      `Platform: ${r.platform || ''}`,
+      `Platform: ${r.platform || pathPlatform || ''}`,
       `Amount: ${r.withdrawalAmount ?? r.amount ?? ''} ${r.currency ?? ''}`,
       `Network: ${r.network ?? ''}`,
       `Address: ${r.address ?? r.withdrawalAddress ?? ''}`,
@@ -109,13 +109,10 @@ export default function ReceiptPage() {
     ].join('\n');
   };
 
-  // Copy receipt: try clipboard image first, then fallback to text
   const handleCopy = async () => {
     if (!receiptRef.current) return;
     try {
       const canvas = await html2canvas(receiptRef.current, { scale: 2 });
-
-      // Try to copy image to clipboard (modern browsers)
       if (navigator.clipboard && navigator.clipboard.write) {
         const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
         if (blob) {
@@ -125,18 +122,14 @@ export default function ReceiptPage() {
             return;
           } catch (err) {
             console.warn('Clipboard image write failed, falling back to text', err);
-            // fall through to text fallback
           }
         }
       }
-
-      // Fallback: copy plain text
       const text = makeReceiptText();
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
         alert('Receipt text copied to clipboard');
       } else {
-        // Last resort prompt
         window.prompt('Copy receipt text (Cmd/Ctrl+C, Enter):', text);
       }
     } catch (err) {
@@ -145,13 +138,11 @@ export default function ReceiptPage() {
     }
   };
 
-  // Download as PNG
   const handleDownloadImage = async () => {
     if (!receiptRef.current) return;
     try {
       const canvas = await html2canvas(receiptRef.current, { scale: 2 });
       const dataUrl = canvas.toDataURL('image/png');
-
       const link = document.createElement('a');
       link.href = dataUrl;
       link.download = 'receipt.png';
@@ -164,13 +155,11 @@ export default function ReceiptPage() {
     }
   };
 
-  // Download as PDF
   const handleDownloadPDF = async () => {
     if (!receiptRef.current) return;
     try {
       const canvas = await html2canvas(receiptRef.current, { scale: 2 });
       const dataUrl = canvas.toDataURL('image/png');
-      // Use jsPDF - scale image to page width
       const pdf = new jsPDF('p', 'pt', 'a4');
       const imgProps = pdf.getImageProperties(dataUrl);
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -183,69 +172,51 @@ export default function ReceiptPage() {
     }
   };
 
-  // Render the appropriate receipt inside a wrapper div with ref so we can capture it
-  const renderedReceipt = (
-    <div ref={receiptRef} style={{ display: 'inline-block' }}>
-      {platform === 'kraken' ? (
-        <KrakenReceipt data={krakenData} isDarkMode={isDarkMode} />
-      ) : platform === 'coinbase' ? (
-        <CoinbaseReceipt data={coinbaseData} isDarkMode={isDarkMode} />
-      ) : (
-        <BinanceReceipt data={binanceData} isDarkMode={isDarkMode} />
-      )}
-    </div>
-  );
+  // Choose which receipt component to render
+  const receiptComponent = (() => {
+    switch (platform) {
+      case 'kraken':
+        return <KrakenReceipt data={krakenData} isDarkMode={isDarkMode} />;
+      case 'coinbase':
+        return <CoinbaseReceipt data={coinbaseData} isDarkMode={isDarkMode} />;
+      case 'binance':
+        return <BinanceReceipt data={binanceData} isDarkMode={isDarkMode} />;
+      case 'revolut':
+        // If you have a RevolutReceipt component, render it here:
+        // return <RevolutReceipt data={/* normalize revolut data */} isDarkMode={isDarkMode} />;
+        // Otherwise show a generic message until you add a proper RevolutReceipt component.
+        return (
+          <div style={{ padding: 16 }}>
+            <h3>Revolut receipt</h3>
+            <p>If you expect a specific Revolut-style receipt, add a RevolutReceipt component and map it here.</p>
+            {/* Optionally reuse BinanceReceipt if you intentionally want that layout:
+                return <BinanceReceipt data={binanceData} isDarkMode={isDarkMode} />
+            */}
+          </div>
+        );
+      default:
+        return (
+          <div style={{ padding: 20 }}>
+            <h3>Unsupported or missing platform</h3>
+            <p>Platform: <strong>{platform || '(none)'}</strong></p>
+            <button onClick={() => navigate(-1)}>Go back</button>
+          </div>
+        );
+    }
+  })();
 
   return (
     <div style={{ padding: 16 }}>
       <MobileFrame deviceType={data.deviceType || 'android'} isDarkMode={isDarkMode}>
-        {renderedReceipt}
+        <div ref={receiptRef} style={{ display: 'inline-block' }}>
+          {receiptComponent}
+        </div>
       </MobileFrame>
 
-      {/* Action buttons below the preview */}
       <div style={{ marginTop: 18, display: 'flex', gap: 12, alignItems: 'center' }}>
-        <button
-          onClick={handleCopy}
-          style={{
-            padding: '10px 16px',
-            background: '#111827',
-            color: '#fff',
-            borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.06)',
-            cursor: 'pointer'
-          }}
-        >
-          Copy Receipt
-        </button>
-
-        <button
-          onClick={handleDownloadImage}
-          style={{
-            padding: '10px 16px',
-            background: '#111827',
-            color: '#fff',
-            borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.06)',
-            cursor: 'pointer'
-          }}
-        >
-          Download PNG
-        </button>
-
-        <button
-          onClick={handleDownloadPDF}
-          style={{
-            padding: '10px 16px',
-            background: '#111827',
-            color: '#fff',
-            borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.06)',
-            cursor: 'pointer'
-          }}
-        >
-          Download PDF
-        </button>
-
+        <button onClick={handleCopy} style={buttonStyle}>Copy Receipt</button>
+        <button onClick={handleDownloadImage} style={buttonStyle}>Download PNG</button>
+        <button onClick={handleDownloadPDF} style={buttonStyle}>Download PDF</button>
         <div style={{ marginLeft: 'auto', color: '#888', fontSize: 13 }}>
           Tip: For best quality use Chrome/Edge and click Download PNG or PDF.
         </div>
@@ -253,3 +224,12 @@ export default function ReceiptPage() {
     </div>
   );
 }
+
+const buttonStyle = {
+  padding: '10px 16px',
+  background: '#111827',
+  color: '#fff',
+  borderRadius: 8,
+  border: '1px solid rgba(255,255,255,0.06)',
+  cursor: 'pointer'
+};
