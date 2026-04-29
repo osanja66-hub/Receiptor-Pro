@@ -6,11 +6,9 @@ import { ThemeContext } from '../context/ThemeContext';
 import { BinanceReceipt } from '../components/BinanceReceipt';
 import KrakenReceipt from '../components/KrakenReceipt';
 import CoinbaseReceipt from '../components/CoinbaseReceipt';
+import RevolutReceipt from '../components/RevolutReceipt';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
-// NOTE: If you have a RevolutReceipt component, import it here:
-// import RevolutReceipt from '../components/RevolutReceipt';
 
 export default function ReceiptPage() {
   const location = useLocation();
@@ -20,12 +18,14 @@ export default function ReceiptPage() {
   const receiptRef = useRef(null);
 
   useEffect(() => {
+    // Prefer navigation state
     if (location.state && location.state.receiptData) {
       setData(location.state.receiptData);
       try { localStorage.setItem('latestReceiptData', JSON.stringify(location.state.receiptData)); } catch {}
       return;
     }
 
+    // Fallback to localStorage
     try {
       const stored = localStorage.getItem('latestReceiptData');
       if (stored) {
@@ -41,11 +41,11 @@ export default function ReceiptPage() {
 
   if (!data) return null;
 
-  // Read platform from data.platform first, fallback to URL path (e.g. /form/revolut)
+  // Platform detection: prefer explicit data.platform, then URL path segment
   const pathPlatform = (location.pathname || '').split('/').filter(Boolean).pop() || '';
   const platform = (data.platform || pathPlatform || '').toString().toLowerCase().trim();
 
-  // Normalizations (unchanged)
+  // Kraken normalization
   const krakenData = {
     withdrawalAmount: data.withdrawalAmount,
     currency: data.currency,
@@ -62,6 +62,7 @@ export default function ReceiptPage() {
     receiptId: data.receiptId || '',
   };
 
+  // Coinbase normalization
   const coinbaseData = {
     amount: data.amount || data.withdrawalAmount || '',
     currency: data.currency || 'ETH',
@@ -78,6 +79,7 @@ export default function ReceiptPage() {
     receiptId: data.receiptId || ''
   };
 
+  // Binance normalization
   const binanceData = {
     withdrawalAmount: data.withdrawalAmount,
     currency: data.currency,
@@ -91,9 +93,29 @@ export default function ReceiptPage() {
     receiptId: data.receiptId || ''
   };
 
-  // If you have a Revolut data normalization, add a revolutData object here.
+  // Revolut normalization (maps your generator fields to the RevolutReceipt props)
+  const revolutData = {
+    toName: data.toName || data.to || data.recipient || '',
+    initials: data.initials || (data.toName ? data.toName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'RY'),
+    amount: (data.amount !== undefined && data.amount !== null) ? String(data.amount) : (data.withdrawalAmount ? String(data.withdrawalAmount * -1) : ''),
+    currency: data.currency || 'USDT',
+    date: data.timestamp || data.date || data.time || '',
+    steps: [
+      { label: 'Request processed', time: data.timestamp || data.date || '', done: true },
+      { label: "Received by recipient’s address", time: data.onchainTxId || data.txHash || data.timestamp || data.date || '', done: !!(data.onchainTxId || data.txHash) }
+    ],
+    txHash: data.txHash || data.onchainTxId || data.txid || data.remarks || '',
+    walletAddress: data.withdrawalAddress || data.address || '',
+    network: data.network || data.networkName || 'Tron',
+    withdrawnAmount: data.withdrawnAmount || data.withdrawalAmount || data.amount || '',
+    withdrawnFiat: data.withdrawnFiat || data.fiat || '',
+    fees: data.fees || data.fee || '',
+    feesFiat: data.feesFiat || data.feeFiat || '',
+    total: data.total || '',
+    totalFiat: data.totalFiat || ''
+  };
 
-  // Capture / copy / download helpers (unchanged from previous implementation)
+  // Helper for copy/download (same as previous)
   const makeReceiptText = () => {
     const r = data || {};
     return [
@@ -182,18 +204,7 @@ export default function ReceiptPage() {
       case 'binance':
         return <BinanceReceipt data={binanceData} isDarkMode={isDarkMode} />;
       case 'revolut':
-        // If you have a RevolutReceipt component, render it here:
-        // return <RevolutReceipt data={/* normalize revolut data */} isDarkMode={isDarkMode} />;
-        // Otherwise show a generic message until you add a proper RevolutReceipt component.
-        return (
-          <div style={{ padding: 16 }}>
-            <h3>Revolut receipt</h3>
-            <p>If you expect a specific Revolut-style receipt, add a RevolutReceipt component and map it here.</p>
-            {/* Optionally reuse BinanceReceipt if you intentionally want that layout:
-                return <BinanceReceipt data={binanceData} isDarkMode={isDarkMode} />
-            */}
-          </div>
-        );
+        return <RevolutReceipt data={revolutData} />;
       default:
         return (
           <div style={{ padding: 20 }}>
